@@ -206,9 +206,15 @@ hr {
 <body>
 <h2>Indices to assess riverscape connectivity</h2>
 
+<p>The riverconn package is used to calculate indices for river network connectivity. For a review of the indices, see <a href="https://doi.org/10.1088/1748-9326/abcb37">Jumani et al., 2021</a>, while for a list of the functionalities of the package and its architecture, see <a href="https://doi.org/10.1016/j.envsoft.2022.105470">Baldan et al., 2022</a>.</p>
+
+<p>If you use this package, cite it as: <a href="https://doi.org/10.1016/j.envsoft.2022.105470">https://doi.org/10.1016/j.envsoft.2022.105470</a>.</p>
+
+<p>For a tutorial on how to generate graphs representing rivers from &ldquo;real world&rdquo; data see: <a href="https://damianobaldan.github.io/riverconn_tutorial/">https://damianobaldan.github.io/riverconn_tutorial/</a> </p>
+
 <h3>The river network as a graph</h3>
 
-<p>This package implements algorithms to compute commonly used indices to assess river networks fragmentation. All those indices assume a conceptualization of the river networks as a graph \(L = (E,V)\), where vertices (nodes) \(V\) represent single reaches, and edges (links) \(E\) represent either confluences or longitudinal barriers. </p>
+<p>This package implements algorithms to compute commonly used indices to assess river networks connectivity All those indices assume a conceptualization of the river networks as a graph \(L = (E,V)\), where vertices (nodes) \(V\) represent single reaches, and edges (links) \(E\) represent either confluences or longitudinal barriers. </p>
 
 <p>For example, the graphs below represents a river with ten reaches. The graph on the left is directed, i.e. edges are defined for ordered pair of vertices. The graph on the right is undirected, as the order of vertices for the definition of edges is unimportant. Both graph have a &#39;tree-like&#39; structure, since no loops exist (acyclic graphs): this structure can be used to describe a river system. In both examples, both barriers and confluences are present. The edges between nodes 1 and 2 and 3 and 2 are confluences. The edge between node 2 and 4 is a barrier. </p>
 
@@ -216,11 +222,11 @@ hr {
 
 <h3>Generalized riverscape connectivity index</h3>
 
-<p>river networks-level connectivity can be expressed in terms of coincidence probability (Pascual-Hortal and Saura, 2006), i.e. the probability that two random points in a river network are connected. Once the coincidence probability \(I_{ij}\) is defined for each couple of \(i,j\) nodes in the graph, generalized connectivity indices for catchment and reach scales can be calculated.</p>
+<p>river networks-level connectivity can be expressed in terms of coincidence probability (Pascual-Hortal and Saura, 2006), i.e. the probability that two random points in a river network are connected. Once the dispersal probability \(I_{ij}\) is defined for each couple of \(i,j\) nodes in the graph, generalized connectivity indices for catchment and reach scales can be calculated.</p>
 
 <h5>Catchment Connectvity index</h5>
 
-<p>Given this conceptualization, a catchment-scale connectivity index (CCI) can be calculated as:</p>
+<p>The catchment-scale connectivity index (CCI) is calculated as:</p>
 
 <p>\[
 \ CCI = \sum_{i = 1}^{n} \sum_{j = 1}^{n} I_{ij} \frac{w_i w_j}{W^2}
@@ -229,7 +235,7 @@ Where \(w_i\) and \(w_j\) are some node-level attributes (weights), and \(W\) is
 
 <h4>Reach Connectivity Index</h4>
 
-<p>A reach-scale connectivity index (RCI) can be calculated by limiting the summation to all the connections to the single node \(i\).
+<p>The reach-scale connectivity index (RCI) is calculated by limiting the summation to all the connections to the single node \(i\).
 \[
 \ RCI_i = \sum_{j = 1}^{n} I_{ij} \frac{w_j}{W}
 \]</p>
@@ -238,24 +244,24 @@ Where \(w_i\) and \(w_j\) are some node-level attributes (weights), and \(W\) is
 
 <p>Nodes weights can be arbitrarily chosen. Common features used are the reach length (\(l_i\)), area(\(A_i\)), or volume(\(V_i\)). Alternatively, the habitat suitability index (HSI) can be used, defined as the ratio of length/area that is suitable for a specific organism.
 \[
-\ HSI_i = \frac{l_i,suitable}{l_i} \mbox{  ;         } HSI_i = \frac{A_i,suitable}{A_i}
+\ HSI_i = \frac{{l}_{i,suitable}}{l_i} \mbox{  ;         } HSI_i = \frac{{A}_{i,suitable}}{A_i}
 \]
-Here \(l_i,suitable\) and \(A_i,suitable\) are the fractions of length/area of reach \(i\) that are suitable, and are usually refferred to as weighted suitable length or weighted suitable area.</p>
+Here \({l}_{i,suitable}\) and \({A}_{i,suitable}\) are the fractions of length/area of reach \(i\) that are suitable, and are usually refferred to as weighted suitable length or weighted suitable area.</p>
 
-<h3>Coincidence probability</h3>
+<h3>Dispersal probability</h3>
 
-<p>The coincidence probability depends on several factors: the presence of barriers between nodes \(i\) and \(j\) , the presence of suitable habitats in nodes \(i\) and \(j\), the distance between \(i\) and \(j\), and the quality of the habitat alongside the connection. The value of \(I_{ij}\) is thus determined by several contributions. The harmonic mean of such contributions is used to follow a &#39;one-bad-all-bad&#39; approach:</p>
+<p>The dispersal probability depends on several factors: the presence of barriers between nodes \(i\) and \(j\) , the presence of suitable habitats in nodes \(i\) and \(j\) and alongside the connection, and the distance between \(i\) and \(j\). The dispersal probability \(I_{ij}\) is thus determined by several contributions. Those contributions are multiplied:</p>
 
 <p>\[
 \ I_{ij} = c_{ij}B_{ij}
 \]
-where \(c_{ij}\) is a &#39;barrier coincidence probability&#39; depending on the presence of barriers between nodes \(i\) and \(j\), \(f_{ij}\) is a &#39;landscape coincidence probability&#39; depending on the landscape friction in the movement between nodes \(i\) and \(j\), and  \(B_{ij}\) is a &#39;dispersal coincidence probability&#39; depends on the distance between nodes \(i\) and \(j\).</p>
+where \(c_{ij}\) accounts for the structural connectivity, i.e. it depends exclusively on the presence of barriers between nodes \(i\) and \(j\), and  \(B_{ij}\) accounts for the functional connectivity, i.e. it depends exclusively on the distance and the organisms movement/dispersal abilities.</p>
 
-<h5>Coincidence probability for barriers</h5>
+<h5>Structural connectivity</h5>
 
-<p>The barriers factor depends on the presence of barriers between nodes \(i\) and \(j\), and can be expressed as a function of the types of barriers present in the path expressed as a sequence of passability values. The passability \(p_m\) for the \(m\)-th barrier is defined as the probability that the reaches immediately upstream and downstream the barrier \(m\) are connected.</p>
+<p>The structural connectivity depends on the presence of barriers between nodes \(i\) and \(j\), and can be expressed as a function of the types of barriers present in the path expressed as a sequence of passability values. The passability \(p_m\) for the \(m\)-th barrier is defined as the probability that the reaches immediately upstream and downstream the barrier \(m\) are connected.</p>
 
-<p>If the flow directionality is not relevant (i.e. the river graph is undirected),</p>
+<p>If the flow directionality is not relevant (i.e. the river graph can be conceptualized as undirected),</p>
 
 <p>\[
 \ c_{ij} = \prod_{m = 1}^{k} p_m^u p_m^d
@@ -274,9 +280,9 @@ p_m^d & \mbox{if barrier m is encountered moving downstream in the path from i t
 \]
 If \(i\) and \(j\) are located in different sub-catchments, the path from i to j will be moving downstream in some sections and upstream in some other secions: this \(p_m^{eq}\) definition ensures the retained passability value is consistent with the directionality of the path from \(i\) to \(j\) (i.e. \(c_{ij} \ne c_{ji}\))</p>
 
-<h5>Coincidence probability for dispersal</h5>
+<h5>Functional connectivity</h5>
 
-<p>The dispersal coincidence probability can be calculated as a function of the distance between reaches. An exponential dispersal kernel can be used:</p>
+<p>Functional connectivity can be calculated as a function of the distance between reaches. An exponential dispersal kernel can be used:</p>
 
 <p>\[
 \ B_{ij} = PD^{d_{ij}}
@@ -290,7 +296,7 @@ where \(PD\) is in the \((0,1)\) interval (smaller values mean more restricted m
 \]
 Both definitions can be easily adapted to asymmetric dispersal by defining \(PD_{d}\), \(PD_{u}\), \(d_{tr,u}\), and \(d_{tr,d}\), and calculating \(B_{ij} = B_{ij}^u B_{ij}^d\) where \(B_{ij}^u\) and \(B_{ij}^d\) are the index \(B_{ij}\) contribution calculated for the &#39;downstream moving&#39; and &#39;upstream moving&#39; sections in the path from  reach \(i\) to \(j\).</p>
 
-<p>The distance \(d_{ij}\) can be either the geometric distance, or any other measure of effective distance (e.g. \(d_{ij} / (1-HSI)\) provides an estimate of effective distance that depends on the habitat suitability index between reaches \(i\) and \(j\))</p>
+<p>The distance \(d_{ij}\) can be either the geometric distance, or any other measure of effective distance (e.g. \(d_{ij} / (1-{HSI}_{ij})\) provides an estimate of effective distance that depends on the habitat suitability index between reaches \(i\) and \(j\))</p>
 
 <h3>Prioritization of barriers</h3>
 
@@ -298,13 +304,13 @@ Both definitions can be easily adapted to asymmetric dispersal by defining \(PD_
 \[
 \ dCCI_{m} = 100 \frac{CCI - CCI_{m, removed}}{GCI} 
 \]
-where \(GCI\) is the generalized connectivity index calculated for the original river networks with all the barriers implemented, and GCI<em>{m, removed} is the index recalculated when barrier \(m\) is removed or its passability is changed ($dRCI</em>{i}$ can be defined similarly) .</p>
+where \(CCI\) is the generalized connectivity index calculated for the original river networks with all the barriers implemented, and CCI<em>{m, removed} is the index recalculated when barrier \(m\) is removed or its passability is changed (an equivalent for the reach scale, $dRCI</em>{i}$, can be defined similarly) .</p>
 
 <p>An alternative version of the index for prioritizing barriers can be calculated as the decrease in river networks connectivity after a single barrier is implemented, with a &#39;add-one&#39; approach.</p>
 
 <h3>Time-dependent connectivity</h3>
 
-<p>when barriers metadata on the year of construction and the year of implementation of mitigation measures are available, a time trajectory of GCI can be computed (e.g. Segurado et al., 2013).</p>
+<p>When barriers metadata on the year of construction and the year of implementation of mitigation measures are available, a time trajectory of GCI can be computed (e.g. Segurado et al., 2013).</p>
 
 <h2>Preliminary steps</h2>
 
@@ -330,9 +336,9 @@ library(doParallel)
 <pre><code class="r">g &lt;- graph_from_literal(1-+2, 2-+5, 3-+4, 4-+5, 6-+7, 7-+10, 8-+9, 9-+10, 
                         5-+11, 11-+12, 10-+13, 13-+12, 12-+14, 14-+15, 15-+16)
 g
-## IGRAPH f56b1ae DN-- 16 15 -- 
+## IGRAPH 09c5033 DN-- 16 15 -- 
 ## + attr: name (v/c)
-## + edges from f56b1ae (vertex names):
+## + edges from 09c5033 (vertex names):
 ##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10
 ## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16
 </code></pre>
@@ -341,13 +347,13 @@ g
 
 <pre><code class="r"># Edges
 E(g)
-## + 15/15 edges from f56b1ae (vertex names):
+## + 15/15 edges from 09c5033 (vertex names):
 ##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10
 ## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16
 
 # vertices
 V(g)
-## + 16/16 vertices, named, from f56b1ae:
+## + 16/16 vertices, named, from 09c5033:
 ##  [1] 1  2  5  3  4  6  7  10 8  9  11 12 13 14 15 16
 </code></pre>
 
@@ -424,7 +430,7 @@ igraph::as_data_frame(g, what = &quot;vertices&quot;)
 E(g)$id_dam &lt;- c(&quot;1&quot;, NA, &quot;2&quot;, &quot;3&quot;, NA, &quot;4&quot;, NA, &quot;5&quot;, &quot;6&quot;, NA,  NA, NA, NA, &quot;7&quot;, NA)
 E(g)$type &lt;- ifelse(is.na(E(g)$id_dam), &quot;joint&quot;, &quot;dam&quot;)
 E(g)
-## + 15/15 edges from f56b1ae (vertex names):
+## + 15/15 edges from 09c5033 (vertex names):
 ##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10
 ## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16
 
@@ -433,7 +439,7 @@ V(g)$length &lt;- c(1, 1, 2, 3, 4, 1, 5, 1, 7, 7, 3, 2, 4, 5, 6, 9)
 V(g)$HSI &lt;- c(0.2, 0.1, 0.3, 0.4, 0.5, 0.5, 0.5, 0.6, 0.7, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8)
 V(g)$Id &lt;- V(g)$name
 V(g)
-## + 16/16 vertices, named, from f56b1ae:
+## + 16/16 vertices, named, from 09c5033:
 ##  [1] 1  2  5  3  4  6  7  10 8  9  11 12 13 14 15 16
 </code></pre>
 
@@ -535,10 +541,10 @@ g_e_df
 # Recreate graph
 g &lt;- igraph::graph_from_data_frame(d = g_e_df, vertices = g_v_df)
 g 
-## IGRAPH fa11ade DN-- 16 15 -- 
+## IGRAPH 0aec8f5 DN-- 16 15 -- 
 ## + attr: name (v/c), length (v/n), HSI (v/n), Id (v/c), id_dam (e/c),
 ## | type (e/c), pass_u (e/n), pass_d (e/n)
-## + edges from fa11ade (vertex names):
+## + edges from 0aec8f5 (vertex names):
 ##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10
 ## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16
 </code></pre>
@@ -546,8 +552,8 @@ g
 <p>Index with default settings.</p>
 
 <pre><code class="r">index_calculation(g, param = 0.9)
-##        num  den     index
-## 1 562.6092 3721 0.1511984
+##        num  den    index
+## 1 553.8299 3721 0.148839
 </code></pre>
 
 <p>Index with default settings, only \(c_{ij}\) or \(B_{ij}\) contributions</p>
@@ -556,8 +562,8 @@ g
 ##        num  den     index
 ## 1 791.8553 3721 0.2128071
 index_calculation(g, param = 0.9, c_ij_flag = FALSE)
-##        num  den    index
-## 1 1210.583 3721 0.325338
+##       num  den     index
+## 1 1200.63 3721 0.3226632
 </code></pre>
 
 <p>Index with default settings, only \(B_{ij}\) contributions with threshold on the distance</p>
@@ -566,17 +572,17 @@ index_calculation(g, param = 0.9, c_ij_flag = FALSE)
                   dir_distance_type = &quot;asymmetric&quot;, 
                   disp_type = &quot;threshold&quot;, param_u = 0, param_d = 5)
 ##   num  den     index
-## 1 413 3721 0.1109917
+## 1 453 3721 0.1217415
 index_calculation(g, c_ij_flag = FALSE,
                   dir_distance_type = &quot;asymmetric&quot;, 
                   disp_type = &quot;threshold&quot;, param_u = 5, param_d = 10)
 ##    num  den     index
-## 1 1045 3721 0.2808385
+## 1 1028 3721 0.2762698
 index_calculation(g, c_ij_flag = FALSE,
                   dir_distance_type = &quot;symmetric&quot;, 
                   disp_type = &quot;threshold&quot;, param = 10)
-##    num  den     index
-## 1 1301 3721 0.3496372
+##    num  den    index
+## 1 1239 3721 0.332975
 </code></pre>
 
 <p>Index for reach, inbound connections used, only \(B_{ij}\) contributions with threshold on the distance</p>
@@ -593,13 +599,13 @@ index_calculation(g, c_ij_flag = FALSE,
 ## 4     4   6  61 0.09836066
 ## 6     6   6  61 0.09836066
 ## 7     7   6  61 0.09836066
-## 10   10   5  61 0.08196721
+## 10   10   7  61 0.11475410
 ## 8     8   7  61 0.11475410
-## 9     9   8  61 0.13114754
-## 11   11   5  61 0.08196721
+## 9     9   7  61 0.11475410
+## 11   11  10  61 0.16393443
 ## 12   12   7  61 0.11475410
 ## 13   13   6  61 0.09836066
-## 14   14   5  61 0.08196721
+## 14   14  11  61 0.18032787
 ## 15   15   6  61 0.09836066
 ## 16   16   9  61 0.14754098
 index_calculation(g, c_ij_flag = FALSE,
@@ -607,42 +613,42 @@ index_calculation(g, c_ij_flag = FALSE,
                   index_type = &quot;reach&quot;, index_mode = &quot;to&quot;,
                   disp_type = &quot;threshold&quot;, param_u = 5, param_d = 10)
 ##    name num den     index
-## 1     1  17  61 0.2786885
-## 2     2  22  61 0.3606557
-## 5     5  22  61 0.3606557
+## 1     1  23  61 0.3770492
+## 2     2  23  61 0.3770492
+## 5     5  23  61 0.3770492
 ## 3     3  14  61 0.2295082
-## 4     4  20  61 0.3278689
-## 6     6  18  61 0.2950820
-## 7     7  25  61 0.4098361
-## 10   10  29  61 0.4754098
+## 4     4  21  61 0.3442623
+## 6     6  11  61 0.1803279
+## 7     7  18  61 0.2950820
+## 10   10  22  61 0.3606557
 ## 8     8  14  61 0.2295082
-## 9     9  24  61 0.3934426
-## 11   11  18  61 0.2950820
-## 12   12  22  61 0.3606557
+## 9     9  17  61 0.2786885
+## 11   11  25  61 0.4098361
+## 12   12  23  61 0.3770492
 ## 13   13  17  61 0.2786885
-## 14   14  13  61 0.2131148
-## 15   15  15  61 0.2459016
+## 14   14  16  61 0.2622951
+## 15   15  20  61 0.3278689
 ## 16   16   9  61 0.1475410
 index_calculation(g, c_ij_flag = FALSE,
                   index_type = &quot;reach&quot;, index_mode = &quot;to&quot;,
                   dir_distance_type = &quot;symmetric&quot;, 
                   disp_type = &quot;threshold&quot;, param = 10)
 ##    name num den     index
-## 1     1  16  61 0.2622951
+## 1     1  21  61 0.3442623
 ## 2     2  25  61 0.4098361
-## 5     5  25  61 0.4098361
+## 5     5  26  61 0.4262295
 ## 3     3  14  61 0.2295082
 ## 4     4  16  61 0.2622951
-## 6     6  18  61 0.2950820
-## 7     7  20  61 0.3278689
-## 10   10  28  61 0.4590164
+## 6     6  11  61 0.1803279
+## 7     7  13  61 0.2131148
+## 10   10  30  61 0.4918033
 ## 8     8  14  61 0.2295082
-## 9     9  27  61 0.4426230
-## 11   11  26  61 0.4262295
-## 12   12  41  61 0.6721311
+## 9     9  19  61 0.3114754
+## 11   11  32  61 0.5245902
+## 12   12  34  61 0.5573770
 ## 13   13  31  61 0.5081967
-## 14   14  24  61 0.3934426
-## 15   15  22  61 0.3606557
+## 14   14  25  61 0.4098361
+## 15   15  25  61 0.4098361
 ## 16   16  15  61 0.2459016
 </code></pre>
 
@@ -672,13 +678,13 @@ d_index_calculation(g,
                     dir_distance_type = &quot;asymmetric&quot;,
                     disp_type = &quot;threshold&quot;)
 ##   id_dam      num  den     index  index_bl   d_index
-## 1      1 761.3266 3721 0.2046027 0.2006519  1.968976
-## 2      2 906.0160 3721 0.2434872 0.2006519 21.348084
-## 3      3 787.2481 3721 0.2115690 0.2006519  5.440798
-## 4      4 771.3265 3721 0.2072901 0.2006519  3.308324
-## 5      5 986.0332 3721 0.2649915 0.2006519 32.065261
-## 6      6 837.7657 3721 0.2251453 0.2006519 12.206919
-## 7      7 824.7457 3721 0.2216463 0.2006519 10.463074
+## 1      1 759.0978 3721 0.2040037 0.1998951  2.055376
+## 2      2 897.4074 3721 0.2411737 0.1998951 20.650131
+## 3      3 784.4321 3721 0.2108122 0.1998951  5.461397
+## 4      4 768.5105 3721 0.2065333 0.1998951  3.320849
+## 5      5 911.6736 3721 0.2450077 0.1998951 22.568122
+## 6      6 834.9497 3721 0.2243885 0.1998951 12.253134
+## 7      7 855.4097 3721 0.2298871 0.1998951 15.003837
 </code></pre>
 
 <p>Calculated index can be joined with the original graph and plotted to check spatial patterns.</p>
@@ -751,11 +757,11 @@ g_e_df
 # Recreate graph
 g &lt;- igraph::graph_from_data_frame(d = g_e_df, vertices = g_v_df)
 g 
-## IGRAPH fefe7fd DN-- 16 15 -- 
+## IGRAPH 0bae142 DN-- 16 15 -- 
 ## + attr: name (v/c), length (v/n), HSI (v/n), Id (v/c), id_dam (e/c),
 ## | type (e/c), pass_u (e/n), pass_d (e/n), num (e/n), den (e/n), index
 ## | (e/n), index_bl (e/n), d_index (e/n)
-## + edges from fefe7fd (vertex names):
+## + edges from 0bae142 (vertex names):
 ##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10
 ## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16
 
