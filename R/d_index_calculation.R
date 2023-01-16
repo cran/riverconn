@@ -39,6 +39,9 @@
 #' When \code{disp_type ="exponential"} (see index_calculation arguments), those values are used as the base of the exponential dispersal kernel: B_ij = param^{d_ij}.
 #' When \code{disp_type ="threshold"} (see index_calculation arguments), those values are used to define the maximum dispersal length: B_ij = ifelse(d_ij < param, 1, 0).
 #'
+#' @references
+#' Baldan, D., Cunillera-Montcusí, D., Funk, A., & Hein, T. (2022). Introducing ‘riverconn’: an R package to assess river connectivity indices. Environmental Modelling & Software, 156, 105470.
+#'
 #' @importFrom dplyr select filter summarize left_join rename mutate rename_with contains matches group_by
 #' @importFrom igraph E V
 #' @import doParallel
@@ -51,7 +54,7 @@
 #' library(igraph)
 #' g <- igraph::graph_from_literal(1-+2, 2-+4, 3-+2, 4-+6, 6-+7, 5-+6, 7-+8, 9-+5, 10-+5 )
 #' E(g)$id_dam <- c(NA, NA, "1", NA, NA, "2", NA, NA, NA)
-#' E(g)$type <- ifelse(is.na(E(g)$id_barrier), "joint", "dam")
+#' E(g)$type <- ifelse(is.na(E(g)$id_dam), "joint", "dam")
 #' V(g)$length <- c(1, 1, 2, 3, 4, 1, 5, 1, 2, 1)
 #' V(g)$Id <- V(g)$name
 #' E(g)$pass_u <- E(g)$pass_d <- ifelse(!is.na(E(g)$id_dam),0.1,NA)
@@ -111,6 +114,8 @@ d_index_calculation <- function(graph,
     NA else list(...)$param_d
   param <- if (is.null(list(...)$param))
     NA else list(...)$param
+  param_l <- if (is.null(list(...)$param_l))
+    NA else list(...)$param_l
 
   # Call the function that calculates the index with the default values
   inner_d_index_calculation(graph = graph,
