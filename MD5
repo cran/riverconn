@@ -1,4 +1,4 @@
-9a27b2158e449849682b53dc34f8090a *DESCRIPTION
+ed7f172cfbfc160b5cdea72929d30c3e *DESCRIPTION
 a885187571c7398e814643a62be43427 *LICENSE
 90f8bb641ccde9fdcca3c0f118041757 *NAMESPACE
 6ca93d3c1b46a29b22fb780b316496e3 *R/B_ij_fun.R
@@ -14,11 +14,11 @@ a5cf2dce489eba8cd1b47c944a329144 *R/set_c_directionality.R
 1c1a9638b19937cf95151ba50738eba4 *R/t_passability_sequencer.R
 09c77f80abcc38ea5f35b1f63b0b15ce *R/t_weights_sequencer.R
 cf794928715019cf81bd51d467156178 *R/utils-pipe.R
-1312adf71fb11b8d419db53a921ae0a0 *README.md
+e92bf2a93d33e4c582b4b5977e882782 *README.md
 8334bb4e9d8be6c4164b088b1632e06c *build/vignette.rds
-db29aafbdfed3b4ed881314f4cb96693 *inst/doc/Tutorial.R
-5c8d522b366e54a08d91cce189b752a0 *inst/doc/Tutorial.Rmd
-2e6619b638fe17084a9821623baeffba *inst/doc/Tutorial.html
+583609883229d634971f983183b4e081 *inst/doc/Tutorial.R
+26f2d36492a46a9cbdb3bb80f4555d17 *inst/doc/Tutorial.Rmd
+f01e6ed319f73675b17eb2849af68911 *inst/doc/Tutorial.html
 86097ad14e8507cfbc054c69caade7cf *man/B_ij_fun.Rd
 16171f79b6088a4423b424a877ed43c1 *man/c_ij_fun.Rd
 d82c05a4e13a815e76a25e363c2bbacb *man/d_index_calculation.Rd
@@ -32,4 +32,4 @@ ec90c72ced59bf538e4e36044ea9a2cd *man/inner_t_index_calculation.Rd
 55441d5b9f3d7025bee01bf27e77fe8d *man/t_index_calculation.Rd
 9a0e99b42edc542596a7806c9c60a045 *man/t_passability_sequencer.Rd
 48ce74617131a578c2ff71939c0fa70a *man/t_weights_sequencer.Rd
-5c8d522b366e54a08d91cce189b752a0 *vignettes/Tutorial.Rmd
+26f2d36492a46a9cbdb3bb80f4555d17 *vignettes/Tutorial.Rmd

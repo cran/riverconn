@@ -1,5 +1,5 @@
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
+## ----setup, echo = FALSE------------------------------------------------------
+knitr::opts_chunk$set(crop = FALSE)
 
 
 ## ----graph example, message = FALSE, collapse = TRUE, width = 60, warning = FALSE, echo = FALSE----
