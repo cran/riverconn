@@ -1,7 +1,7 @@
 Package: riverconn
 Type: Package
-Title: Common Fragmentation and Connectivity Indices for Riverscapes
-Version: 0.3.26
+Title: Fragmentation and Connectivity Indices for Riverscapes
+Version: 0.3.28
 Authors@R: c(
     person("Damiano", "Baldan", email = "damiano.baldan91@gmail.com", role = c("aut", "cre"),
          comment = c(ORCID = "0000-0001-9237-4883")),
@@ -17,10 +17,10 @@ Suggests: knitr, ggnetwork, ggplot2, viridis, rmarkdown
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2023-03-15 16:31:49 UTC; Damiano
+Packaged: 2023-05-05 07:14:59 UTC; Damiano
 Author: Damiano Baldan [aut, cre] (<https://orcid.org/0000-0001-9237-4883>),
   David Cunillera-Montcusi [ctb]
     (<https://orcid.org/0000-0001-8666-346X>),
   Andrea Funk [ctb] (<https://orcid.org/0000-0002-0568-1234>)
 Repository: CRAN
-Date/Publication: 2023-03-15 16:40:02 UTC
+Date/Publication: 2023-05-05 08:20:02 UTC

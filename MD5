@@ -1,10 +1,10 @@
-ed7f172cfbfc160b5cdea72929d30c3e *DESCRIPTION
+52efe1d02fac1b6898f6509d4b69bb83 *DESCRIPTION
 a885187571c7398e814643a62be43427 *LICENSE
 90f8bb641ccde9fdcca3c0f118041757 *NAMESPACE
 6ca93d3c1b46a29b22fb780b316496e3 *R/B_ij_fun.R
 b052916fe3320b943acee3e151e90317 *R/c_ij_fun.R
 24938194299836771d0659690f02bd87 *R/d_index_calculation.R
-49de84d8f5501dcbb37ac1015c898b0c *R/index_calculation.R
+e8cfacceb8c8e3735e00cb6fefaa6d26 *R/index_calculation.R
 67f76281022efb5d0d7cc57a07eab0bf *R/inner_d_index_calculation.R
 31efe181d6f1bd364b965b95f8288c9d *R/inner_t_index_calculation.R
 ef44aa7455d132ccc68b2ed8a5263480 *R/set_B_directionality.R
@@ -14,11 +14,11 @@ a5cf2dce489eba8cd1b47c944a329144 *R/set_c_directionality.R
 1c1a9638b19937cf95151ba50738eba4 *R/t_passability_sequencer.R
 09c77f80abcc38ea5f35b1f63b0b15ce *R/t_weights_sequencer.R
 cf794928715019cf81bd51d467156178 *R/utils-pipe.R
-e92bf2a93d33e4c582b4b5977e882782 *README.md
-8334bb4e9d8be6c4164b088b1632e06c *build/vignette.rds
+593d2b2232eb553af4aed2bb1cc4b8ad *README.md
+6376a638073828f82b0d93b225dc3743 *build/vignette.rds
 583609883229d634971f983183b4e081 *inst/doc/Tutorial.R
 26f2d36492a46a9cbdb3bb80f4555d17 *inst/doc/Tutorial.Rmd
-f01e6ed319f73675b17eb2849af68911 *inst/doc/Tutorial.html
+7410b6f3db80db10a661d8deb788bcf8 *inst/doc/Tutorial.html
 86097ad14e8507cfbc054c69caade7cf *man/B_ij_fun.Rd
 16171f79b6088a4423b424a877ed43c1 *man/c_ij_fun.Rd
 d82c05a4e13a815e76a25e363c2bbacb *man/d_index_calculation.Rd
