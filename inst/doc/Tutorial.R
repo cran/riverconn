@@ -15,7 +15,6 @@ par(oldpar)
 library(igraph)
 library(dplyr)
 library(tidyr)
-library(ggnetwork)
 library(viridis)
 library(riverconn)
 library(doParallel)
@@ -54,27 +53,6 @@ V(g)$HSI <- c(0.2, 0.1, 0.3, 0.4, 0.5, 0.5, 0.5, 0.6, 0.7, 0.8, 0.8, 0.8, 0.8, 0
 V(g)$Id <- V(g)$name
 V(g)
 
-
-## ----plot igraph, message = FALSE, collapse = TRUE, width = 60, warning = FALSE----
-gg0 <- ggnetwork(g, layout =  layout_as_tree(g %>% as.undirected, root = 16), scale = FALSE)
-
-ggplot(gg0, aes(x = x, y = y, xend = xend, yend = yend)) +
-  geom_nodes(alpha = 0.3) +
-  geom_edges(alpha = 0.5, 
-             arrow = arrow(length = unit(10, "pt"), type = "closed"), 
-             aes(color = type)) + 
-  scale_color_viridis(discrete = TRUE)+
-  geom_nodetext(aes(label = name), fontface = "bold") +
-  theme_blank()
-
-
-## ----plot igraph 2, message = FALSE, collapse = TRUE, width = 60, warning = FALSE----
-ggplot(gg0, aes(x = x, y = y, xend = xend, yend = yend)) +
-  geom_edges(alpha = 0.5, 
-             arrow = arrow(length = unit(10, "pt"), type = "open")) +
-  geom_nodes(aes(size = length, color = HSI)) +
-  scale_color_viridis()+
-  theme_blank()
 
 ## ----direction, message = FALSE, collapse = TRUE, width = 60, warning = FALSE----
 oldpar <- par(mfrow = c(1,1))
@@ -149,39 +127,6 @@ d_index_calculation(g,
                     index_type = "full",
                     dir_distance_type = "asymmetric",
                     disp_type = "threshold")
-
-
-
-## ----plot join, message = FALSE, collapse = TRUE, width = 60, warning = FALSE----
-
-d_index <- d_index_calculation (g,
-                                barriers_metadata = dams_metadata,
-                                id_barrier = "id_dam",
-                                parallel = FALSE, ncores = 3,
-                                param_u = 10,  param_d = 10,
-                                index_type = "full",
-                                B_ij_flag = FALSE)
-
-# Check edged and nodes attributes
-g_v_df <- igraph::as_data_frame(g, what = "vertices")
-g_v_df
-g_e_df <- igraph::as_data_frame(g, what = "edges") %>%
-  left_join(d_index, by = "id_dam")
-g_e_df
-
-# Recreate graph
-g <- igraph::graph_from_data_frame(d = g_e_df, vertices = g_v_df)
-g 
-
-# Fortify and plot graph
-gg0 <- ggnetwork(g, layout =  layout_as_tree(g %>% as.undirected, root = 16), scale = FALSE)
-ggplot(gg0, aes(x = x, y = y, xend = xend, yend = yend)) +
-  geom_edges(alpha = 0.5, size = 3,
-             arrow = arrow(length = unit(10, "pt"), type = "open"), 
-             aes(color = d_index)) +
-  geom_nodes() +
-  scale_color_viridis()+
-  theme_blank()
 
 
 

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Damiano Baldan" />
 
-<meta name="date" content="2023-05-05" />
+<meta name="date" content="2024-01-23" />
 
 <title>riverconn vignette</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">riverconn vignette</h1>
 <h4 class="author">Damiano Baldan</h4>
-<h4 class="date">2023-05-05</h4>
+<h4 class="date">2024-01-23</h4>
 
 
 <div id="TOC">
@@ -376,14 +376,12 @@ connectivity</a></li>
 object</a></li>
 <li><a href="#decorating-the-class-igraph-object" id="toc-decorating-the-class-igraph-object"><span class="toc-section-number">2.3</span> Decorating the class ‘igraph’
 object</a></li>
-<li><a href="#visualizing-the-igraph-object" id="toc-visualizing-the-igraph-object"><span class="toc-section-number">2.4</span> Visualizing the ‘igraph’
-object</a></li>
-<li><a href="#assigning-network-directionality" id="toc-assigning-network-directionality"><span class="toc-section-number">2.5</span> Assigning network
+<li><a href="#assigning-network-directionality" id="toc-assigning-network-directionality"><span class="toc-section-number">2.4</span> Assigning network
 directionality</a></li>
 </ul></li>
 <li><a href="#indices-calculation" id="toc-indices-calculation"><span class="toc-section-number">3</span> Indices calculation</a></li>
-<li><a href="#barriers-prioritization-calculation-and-visualization" id="toc-barriers-prioritization-calculation-and-visualization"><span class="toc-section-number">4</span> Barriers prioritization calculation
-and visualization</a></li>
+<li><a href="#barriers-prioritization-calculation" id="toc-barriers-prioritization-calculation"><span class="toc-section-number">4</span> Barriers prioritization
+calculation</a></li>
 <li><a href="#references-and-key-literature" id="toc-references-and-key-literature"><span class="toc-section-number">5</span> References and key
 literature</a></li>
 </ul>
@@ -584,13 +582,12 @@ be found here: <a href="https://damianobaldan.github.io/riverconn_tutorial/" cla
 <div id="preliminary-steps" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Preliminary
 steps</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggnetwork)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(riverconn)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(riverconn)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code></pre></div>
 </div>
 <div id="input-class-igraph-object" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Input class ‘igraph’
@@ -600,89 +597,89 @@ object of class <code>igraph</code>. There are different ways an object
 of class <code>igraph</code> can be created. A symbolic sequence of
 edges can be used with the function <code>graph_from_literal</code> for
 small, toy graphs.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_literal</span>(<span class="dv">1</span><span class="sc">-+</span><span class="dv">2</span>, <span class="dv">2</span><span class="sc">-+</span><span class="dv">5</span>, <span class="dv">3</span><span class="sc">-+</span><span class="dv">4</span>, <span class="dv">4</span><span class="sc">-+</span><span class="dv">5</span>, <span class="dv">6</span><span class="sc">-+</span><span class="dv">7</span>, <span class="dv">7</span><span class="sc">-+</span><span class="dv">10</span>, <span class="dv">8</span><span class="sc">-+</span><span class="dv">9</span>, <span class="dv">9</span><span class="sc">-+</span><span class="dv">10</span>, </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                        <span class="dv">5</span><span class="sc">-+</span><span class="dv">11</span>, <span class="dv">11</span><span class="sc">-+</span><span class="dv">12</span>, <span class="dv">10</span><span class="sc">-+</span><span class="dv">13</span>, <span class="dv">13</span><span class="sc">-+</span><span class="dv">12</span>, <span class="dv">12</span><span class="sc">-+</span><span class="dv">14</span>, <span class="dv">14</span><span class="sc">-+</span><span class="dv">15</span>, <span class="dv">15</span><span class="sc">-+</span><span class="dv">16</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>g</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## IGRAPH 86e8a11 DN-- 16 15 -- </span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## + attr: name (v/c)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">## + edges from 86e8a11 (vertex names):</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_literal</span>(<span class="dv">1</span><span class="sc">-+</span><span class="dv">2</span>, <span class="dv">2</span><span class="sc">-+</span><span class="dv">5</span>, <span class="dv">3</span><span class="sc">-+</span><span class="dv">4</span>, <span class="dv">4</span><span class="sc">-+</span><span class="dv">5</span>, <span class="dv">6</span><span class="sc">-+</span><span class="dv">7</span>, <span class="dv">7</span><span class="sc">-+</span><span class="dv">10</span>, <span class="dv">8</span><span class="sc">-+</span><span class="dv">9</span>, <span class="dv">9</span><span class="sc">-+</span><span class="dv">10</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                        <span class="dv">5</span><span class="sc">-+</span><span class="dv">11</span>, <span class="dv">11</span><span class="sc">-+</span><span class="dv">12</span>, <span class="dv">10</span><span class="sc">-+</span><span class="dv">13</span>, <span class="dv">13</span><span class="sc">-+</span><span class="dv">12</span>, <span class="dv">12</span><span class="sc">-+</span><span class="dv">14</span>, <span class="dv">14</span><span class="sc">-+</span><span class="dv">15</span>, <span class="dv">15</span><span class="sc">-+</span><span class="dv">16</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>g</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="do">## IGRAPH cfc7356 DN-- 16 15 -- </span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="do">## + attr: name (v/c)</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="do">## + edges from cfc7356 (vertex names):</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span></code></pre></div>
 <p>Note that when a graph is defined this way, edged and vertices
 attributes are not defined.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Edges</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## + 15/15 edges from 86e8a11 (vertex names):</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># vertices</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="do">## + 16/16 vertices, named, from 86e8a11:</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1  2  5  3  4  6  7  10 8  9  11 12 13 14 15 16</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Edges</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">E</span>(g)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="do">## + 15/15 edges from cfc7356 (vertex names):</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># vertices</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">V</span>(g)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="do">## + 16/16 vertices, named, from cfc7356:</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="do">##  [1] 1  2  5  3  4  6  7  10 8  9  11 12 13 14 15 16</span></span></code></pre></div>
 <p>The graph can be converted to data frame with the function
 <code>as_data_frame</code>, specifying if edges or vertices are to be
 exported. Accordingly, the function <code>graph_from_data_frame</code>
 can be used to create an igraph object from a data frame.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;edges&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">##    from to</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1  2</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2  5</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     5 11</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     3  4</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     4  5</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6  7</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7 10</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 8    10 13</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     8  9</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 10    9 10</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11 12</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12 14</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13 12</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14 15</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15 16</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;vertices&quot;</span>)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">##    name</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     5</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     3</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     4</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 10   10</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     8</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     9</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 16   16</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;edges&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="do">##    from to</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## 1     1  2</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">## 2     2  5</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">## 3     5 11</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="do">## 4     3  4</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="do">## 5     4  5</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="do">## 6     6  7</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="do">## 7     7 10</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="do">## 8    10 13</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="do">## 9     8  9</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="do">## 10    9 10</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="do">## 11   11 12</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="do">## 12   12 14</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="do">## 13   13 12</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="do">## 14   14 15</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="do">## 15   15 16</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;vertices&quot;</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="do">##    name</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="do">## 1     1</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="do">## 2     2</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="do">## 5     5</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="do">## 3     3</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="do">## 4     4</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="do">## 6     6</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="do">## 7     7</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="do">## 10   10</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="do">## 8     8</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="do">## 9     9</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="do">## 11   11</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="do">## 12   12</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="do">## 13   13</span></span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="do">## 14   14</span></span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="do">## 15   15</span></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="do">## 16   16</span></span></code></pre></div>
 <p>Finally, an igraph object can be exported to and generated from
 adjacency matrices using the functions <code>as_adjacency_matrix</code>
 and <code>graph_from_adjacency_matrix</code>, specifying if edges or
 vertices are to be exported.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">as_adjacency_matrix</span>(g)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 16 x 16 sparse Matrix of class &quot;dgCMatrix&quot;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">##                                   </span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  . 1 . . . . . . . . . . . . . .</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  . . 1 . . . . . . . . . . . . .</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 5  . . . . . . . . . . 1 . . . . .</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  . . . . 1 . . . . . . . . . . .</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 4  . . 1 . . . . . . . . . . . . .</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 6  . . . . . . 1 . . . . . . . . .</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 7  . . . . . . . 1 . . . . . . . .</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 10 . . . . . . . . . . . . 1 . . .</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 8  . . . . . . . . . 1 . . . . . .</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 9  . . . . . . . 1 . . . . . . . .</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 11 . . . . . . . . . . . 1 . . . .</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 12 . . . . . . . . . . . . . 1 . .</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 13 . . . . . . . . . . . 1 . . . .</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 14 . . . . . . . . . . . . . . 1 .</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 15 . . . . . . . . . . . . . . . 1</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 16 . . . . . . . . . . . . . . . .</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">as_adjacency_matrix</span>(g)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="do">## 16 x 16 sparse Matrix of class &quot;dgCMatrix&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="do">##                                   </span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">## 1  . 1 . . . . . . . . . . . . . .</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="do">## 2  . . 1 . . . . . . . . . . . . .</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="do">## 5  . . . . . . . . . . 1 . . . . .</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="do">## 3  . . . . 1 . . . . . . . . . . .</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="do">## 4  . . 1 . . . . . . . . . . . . .</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="do">## 6  . . . . . . 1 . . . . . . . . .</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="do">## 7  . . . . . . . 1 . . . . . . . .</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="do">## 10 . . . . . . . . . . . . 1 . . .</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="do">## 8  . . . . . . . . . 1 . . . . . .</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="do">## 9  . . . . . . . 1 . . . . . . . .</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="do">## 11 . . . . . . . . . . . 1 . . . .</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="do">## 12 . . . . . . . . . . . . . 1 . .</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="do">## 13 . . . . . . . . . . . 1 . . . .</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="do">## 14 . . . . . . . . . . . . . . 1 .</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="do">## 15 . . . . . . . . . . . . . . . 1</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="do">## 16 . . . . . . . . . . . . . . . .</span></span></code></pre></div>
 </div>
 <div id="decorating-the-class-igraph-object" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> Decorating the class
@@ -696,65 +693,37 @@ data.frame-like operations are possible.</p>
 field ‘id_dam’, and the reach information data as vertices attributes,
 including the length and the corresponding habitat suitability
 index.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Decorate edges </span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g)<span class="sc">$</span>id_dam <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;4&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="cn">NA</span>,  <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">&quot;7&quot;</span>, <span class="cn">NA</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g)<span class="sc">$</span>type <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(<span class="fu">E</span>(g)<span class="sc">$</span>id_dam), <span class="st">&quot;joint&quot;</span>, <span class="st">&quot;dam&quot;</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="do">## + 15/15 edges from 86e8a11 (vertex names):</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Decorate vertices</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>length <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">9</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>HSI <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>, <span class="fl">0.7</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>Id <span class="ot">&lt;-</span> <span class="fu">V</span>(g)<span class="sc">$</span>name</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="do">## + 16/16 vertices, named, from 86e8a11:</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1  2  5  3  4  6  7  10 8  9  11 12 13 14 15 16</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Decorate edges </span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">E</span>(g)<span class="sc">$</span>id_dam <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;4&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="cn">NA</span>,  <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">&quot;7&quot;</span>, <span class="cn">NA</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">E</span>(g)<span class="sc">$</span>type <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(<span class="fu">E</span>(g)<span class="sc">$</span>id_dam), <span class="st">&quot;joint&quot;</span>, <span class="st">&quot;dam&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">E</span>(g)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="do">## + 15/15 edges from cfc7356 (vertex names):</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co"># Decorate vertices</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>length <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">9</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>HSI <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>, <span class="fl">0.7</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>Id <span class="ot">&lt;-</span> <span class="fu">V</span>(g)<span class="sc">$</span>name</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="fu">V</span>(g)</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="do">## + 16/16 vertices, named, from cfc7356:</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="do">##  [1] 1  2  5  3  4  6  7  10 8  9  11 12 13 14 15 16</span></span></code></pre></div>
 </div>
-<div id="visualizing-the-igraph-object" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Visualizing the
-‘igraph’ object</h2>
-<p>The <code>ggnetwork</code> library can be used to plot a igraph
-object with <code>tidyverse</code>-friendly functions. The function
-<code>ggnetwork</code> is used to fortify <code>igraph</code> objects
-with a specified layout. Here the tree layout is used, but for real
-river networks the coordinates of the reaches centroids can be used.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>gg0 <span class="ot">&lt;-</span> <span class="fu">ggnetwork</span>(g, <span class="at">layout =</span>  <span class="fu">layout_as_tree</span>(g <span class="sc">%&gt;%</span> as.undirected, <span class="at">root =</span> <span class="dv">16</span>), <span class="at">scale =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(gg0, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend)) <span class="sc">+</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_nodes</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edges</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&quot;pt&quot;</span>), <span class="at">type =</span> <span class="st">&quot;closed&quot;</span>), </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">color =</span> type)) <span class="sc">+</span> </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis</span>(<span class="at">discrete =</span> <span class="cn">TRUE</span>)<span class="sc">+</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_nodetext</span>(<span class="fu">aes</span>(<span class="at">label =</span> name), <span class="at">fontface =</span> <span class="st">&quot;bold&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_blank</span>()</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>This function can be used to display all the graph attributes.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(gg0, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend)) <span class="sc">+</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edges</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&quot;pt&quot;</span>), <span class="at">type =</span> <span class="st">&quot;open&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_nodes</span>(<span class="fu">aes</span>(<span class="at">size =</span> length, <span class="at">color =</span> HSI)) <span class="sc">+</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis</span>()<span class="sc">+</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_blank</span>()</span></code></pre></div>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAB2lBMVEUAAAAAADoAAGYAOjoAOpAAZrYenIkflYsfmIsfmYofnokfoIgfoYcfoocgkowgo4Yhjo0hj40hpoUii40jiI4jqYQkh44kqoMlhI4mgY4mgo4mrYEnfo4nf44nrYEofY4peo4qdo4qeI4qsH8sco4sc44tcI4ubo4us3wvbI4waY4wtHwxZ44yZY4zYo00YY00tnk1Xo02XI02uHg3Wow5VYw5V4w6AAA6ADo6AGY6OgA6OpA6kNs6unY7Uos8UIs9Too+S4k+vHM/SIlARohBRIdBvXJCQYZDPoVEAVREOYNEO4RFA1dFNoFGB1tGCl1GMX5GMn5GNIBGwG9HDmFHEWRHK3pHLnxIFGdIF2lIGmxIHW9IIHFII3RIJXZIKHhKwW1Ow2tTxWhYxmZcyGNhy2BmAABmADpmAGZmOpBmkJBmtrZmtv9my11rzVpwz1d10FR60lF/f3+A006G1UqL1kaQOgCQOjqQOmaQkGaQtpCQ2/+R10OW2D+c2Tyf2jqi2jeo2zSu3DC03iy2ZgC2kDq2tma225C2//+63ijA3yXF4CHL4R7R4hvY4hnbkDrb/7bb///d4xjj5Bno5Bnu5Rz05h755iL95yX/tmb/25D//7b//9v///8lob5kAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAL4klEQVR4nO2dh5/jOBWAvcsuNfRehnL03hlK6O2WvvTO0OYooRlYygIDRw6WGpaazIz/Vyw7kuXk2e9Jlp4cWd9vdyZjjZ6sbxS5SFayItFLFnoHxk4ShJAEISRBCEkQQhKEkAQhJEEISRBCEoTAJWhdwlSUW1gErRUcpbmFQ9B6Hc7Q5a3r1ffltbtFcXGaZdnVO0WxuXKbGoBB0Hod0JAuaJMtxKtSzqgErdchDemCltflliRIoQmSL4uRvcVGI6h8i0lDYxK064fZ0OWtrEZ00ufHdR+dBDW0jmLVz9nIOumRCRIvr95JghSaoPPjRfWytDMmQePppOXLzbha0HgElUcx8T7bZPNR9UEjElRfagg3oxIU9lJjMLFfrA4m3e5A4Llhlm9vmOUspTmFRVDe/nJQcAjK976Oh/LSo7o6K6orNeDgNnVBy+vb20TlOcCiWElZDXyjGmNTU3Fx3+3i/E2VFfFN/LjDxAVpVi5vLYpNc0krmYKgnjNVvdmU3dG+n+gF/Q9GJmuCLk7nU+yD/gsjkzVBE+2D/gMjk1Mn/W8Yld4c5i9vTfIt9i8YlX5xWp0oLuchTxRrwgj6Jww9QOyC/g5DDxC7oL/B0APELuivMPQAsQv6Cww9QOyC/gxDDxC7oD/B0ANwzlEMcUf69zD0ADyCwt20vx+GHoB5VIPd0O9g6AG4x8W4Df0Whh4gdkG/gaEHYB96Zjb0axh6gNgF/QqGHiB2QT+FoQeIXdBPYOgBYhf0Yxh6gNiPYj+CoQeIXdAPYegBYj+T/gEMPUDs12Lfh6EH4JxAtQ5wx+N7MPQAXIKa/7x8E4YeIPYZZt+AUenaBCrx3Mt8L0Dsgr4Oo9KbkdXqaYU3Bhl6DjnD7GswMlkbmwfG5QWxCxJ8tUUraWd2B0DsN+1PYGSyJmhz7YEsW+wFiF3QJ2Bksi4IfsgldkHvg5HJrRZ0t5qnuEPsgt4FI5N3JlBNUNBbYVS6fpifi2ftdgPELui1MCpdm0AlThSn10m/CoYeIHZBL4WhB4hd0Itg6AFiF/RcGHqA2AU9E4YeIHZBT4ehB4hd0JNh6AFiF/REGHqA2AU9DoYegElQoDGNong0DD0A77APS2EtHglDDxD7wgKPgKEHiH1piofD0ANwz+7wX1ybB8PQA8S++svDYOgBYhf0UBh6gNgFPQSGHiB2QY+CoQeIvZM+BEFBD/OPhaEHiP1E8TEw9ACxX2o8HoYegPViNcAF/RNg6AFYZ5gFEPQkGJWuTaCCJ3jEPgXvKTAqXRtZrZbB3QsQ+wyzp8HIZG1svig2DwrVggKvgvfUFq2k1gJLP/9jIEEhZ5g9A0Ym64JW81B9UEhBz4KRyfoKVN++G66TFoS5af9sGJmsCVouAh7FBGEE3QMjk5tOulpKGZj/Erug58Co9NZhfoot6PkwKl2bQDVNQc+DoQeIXdALYOgBYhf0Qhh6gNgFvRiGHiB2QS+BoQeIXdDLYOgBYhf0chh6gNgFvQKGHiB2Qa+EoQeIXdCrYegBYhf0Ghh6gNgFvQ6GHiB2QW+AoQeIXdDrYegB2ASFmeRavA2GHoB1ZDWAorfD0APELugdMPQAsS+P804YeoDYBb0bhh7Ap6BcoQSpLR6LbfEeGHqA2Pug98LQA/CMzeeqAXEUp/N+GHoApqHnao2uEFOE7oWhB/AvKG8mBuXyRz4+CKPS2x/hF2Bhgbw16yVvNjHxARiV3v4IP/7VX/LWt90fGfgwjEzWJlCFWP0l3xOStxN4+HiLVtLOZ2aJVrSDR0GNhT1BfI3oYzAyeUfQivMzDgEr+mumRvQZGJncFgR8vJg3QXr9QUFMij4NI5NbglbQh6x7EkSrO4Ohr8DIZH2WK9R+PAkitw3/jejLMCq9OcwDi0wKPAgyqrVvRV+CUenNBKol1xQ80xr7NfRFGHoA14IsWoTXRvQFGHoAt4Is6+pR0edh6AGcCrKvpzdDn4OhB3AoaFA78NWIPgtDD+BM0OAa+lH0KRh6AFeCXNTOh6FPwtADuBHk6K/voRF9FIYewIUgh/VyrugjMPQADgS5rZNjQx+CoQcYLMj535x/5KOXgYK81GZUhoYJ8lSVMTWiIYI81mM8igYI8lsHGT3QkLXCUFCzu97/xnUBwQb1JWaC1O6yvAXyPOC8GYmRoGYWi6/d6SownCETQey7q6/MFMpQEoSQBCEkQQhJEILdUczX3nQWeBhHsQCnbcH9WJ1Jc14nhfZjKChnX6stZ/+T7GAjiNFQuOXzJEaC+BezC7d8nsRKENv+qsIOQ5DmhmeHtbKCGUqCEIzvKPLvadi7r0kQQhKEkAQhJEEISRBCEoSQBCEkQQhJEEIShJAEISRBCLELAp5C1dgskF+YuCCRmAQlQb1U9V9lWTYXr797Wj8yt8yyK7+48svjLLv2j9PvgCsuSKYgSDyse348L1+XL8QP4iNqNtmV23UL2m7sYAKCLk7FgvWbq3eqF+fHi/JfuWEpBdUbuwKYCjJaxdINQwXVC3KUDqq3m9hQPd68kYIWvT2VmSDjhT5dMFhQVqMEreISdHIyJLdqQUVR+G9BFmvFDubkZJChqg9aqNfVl7rHWSVBAnkUk31ytaE5is0PX1B+cjKkE1LnQaWTxkV5HnT1D+WWpTgPcigo3/phe5Ii97is4AZcqmMPsqBqL1UD4lgJsSojF/Pt823xjqj6oPrsCIcmSO2daENyyNyrIxk9rxW5LXEDrtIBQxGkLyWVb79sf/RE3pTQKjDAebzp/CDeSXjsBe5jOv2FdRIee4EABoLkPB22+Tqt+WWhDNEFqdlMXFOomnJCTqFKghDo50HNVx5D7AXCUAXl2re8tckTrUICGiIKap35eD8N2iuD5U8CQzyTNtrsAPYCOyEJ6twvXzvMXmA3SRAC6VrMKmkAPgoU16dW+fBf6d0nH4Z8FFjft9/frq3TLl7aLJeM7JF7Qz4K3A5s7NVWX6d9c30vW0EQhO6Pa0M+CsyyDkP6Ou1L8A7axAUJtjekL39mtRowYW/cGvJSYK+g7TrtF/e9OQOG6BFBpH1xachPgX2C5DrbYj3pi2/t3cjvF0TcE3eGfBXY40dvNdr6/yqnk/1wZchfgVj7qTEUZLAXbgz5LLDjNKhZp12Mk52/xeg8aOyCHKw5INdpF4f4VZaZfWyEUaUHGJpVmBfIs2pFtyDDKufbmhrvwWyLYYFcC8N0CjJuEvlsZmNopjDLF1qQ+VvGrqKzmZ2h1tJCPg11CBrgx6iiM0tB6zWXIUjQjRvmgixrOrPMF1TQjRLjOEkQwpQElYYGdUHxC7KZqORCkEFxQQVVk7qMA9lVlO0w33k3CM24v8lOkOV5ENOJYs/9Mizn3pbcdkqXVT21Sw0zjAT13lFEsu5u0GZ1mZHXVbV9c5rnM28/Noa6BFlcixV2Zu0L3PpBM2Y9grTBMO1TjfXMwO5aTVhSeUwrajtDir6nWY8hbTCs+bjDVmbrYrsyequndcY+Qc1gmP6BmXpmoFSb+UpaFrOKallsC8Qy9gjSBsN2PrRXZbYutjOjr3paZ+wRpA2G0QTphVtgm9FvgT3vMG0wbMKCkMP81sqUBSFj87UVWidtVKy7jN4L7PKjD4bRDvNGxTrL6L/ArvazHQxbztWnGu9mHFSsq4zsBdJJghCSIIQkCCEJQkiCEJIghCQIYTKCHI5qHIygswrSrzq8aS84DEFnZ2RDLm/aCw5B0JkG9rt9d+3RvNBGy3oeCaxy+hXUvqNoaMihoKMja0PmBZ6d0Q31CKrXN6tv3Bs8DmUl6OjI3pBxgWdndEPZLjvpciEh+uNQN2+a7m+h+bEwZD5e7VCQWn2K/DjUzZs2hgYIshiZdyhoJQdWyY9DTUuQfJzO5HGoSb3F1H16q8ehDBgiyBwTQf2H+ZXeNZs+DmUEpx9nh/mdrtmroCHnQRY4OpNWXZDN41CmcPoxEtRzLbZtM1aPQ40dsp7C+dX8gUD3Uzi+H5RoSIIQkiCEJAghCUJIghCSIIQkCCEJQkiCEJIghCQIIQlCSIIQkiCEJAghCUL4PzknnZ5BnyuwAAAAAElFTkSuQmCC" /><!-- --></p>
-</div>
-<div id="assigning-network-directionality" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Assigning network
+<div id="assigning-network-directionality" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Assigning network
 directionality</h2>
 <p>The <code>riverconn</code> package implements the function
 <code>set_graph_directionality</code> that allows to assign the
 directionality of the graph once an outlet is defined.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>oldpar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> <span class="fu">set_graph_directionality</span>(g, <span class="at">field_name =</span> <span class="st">&quot;Id&quot;</span>, <span class="at">outlet_name =</span> <span class="st">&quot;16&quot;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">set_graph_directionality</span>(g, <span class="at">field_name =</span> <span class="st">&quot;Id&quot;</span>, <span class="at">outlet_name =</span> <span class="st">&quot;5&quot;</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.undirected</span>(g), <span class="at">layout =</span> <span class="fu">layout_as_tree</span>(<span class="fu">as.undirected</span>(g), <span class="at">root =</span> <span class="dv">8</span>, <span class="at">flip.y =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g1, <span class="at">layout =</span> <span class="fu">layout_as_tree</span>(<span class="fu">as.undirected</span>(g1), <span class="at">root =</span> <span class="dv">16</span>, <span class="at">flip.y =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g2, <span class="at">layout =</span> <span class="fu">layout_as_tree</span>(<span class="fu">as.undirected</span>(g2), <span class="at">root =</span> <span class="dv">5</span>, <span class="at">flip.y =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>oldpar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> <span class="fu">set_graph_directionality</span>(g, <span class="at">field_name =</span> <span class="st">&quot;Id&quot;</span>, <span class="at">outlet_name =</span> <span class="st">&quot;16&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">set_graph_directionality</span>(g, <span class="at">field_name =</span> <span class="st">&quot;Id&quot;</span>, <span class="at">outlet_name =</span> <span class="st">&quot;5&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.undirected</span>(g), <span class="at">layout =</span> <span class="fu">layout_as_tree</span>(<span class="fu">as.undirected</span>(g), <span class="at">root =</span> <span class="dv">8</span>, <span class="at">flip.y =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">plot</span>(g1, <span class="at">layout =</span> <span class="fu">layout_as_tree</span>(<span class="fu">as.undirected</span>(g1), <span class="at">root =</span> <span class="dv">16</span>, <span class="at">flip.y =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">plot</span>(g2, <span class="at">layout =</span> <span class="fu">layout_as_tree</span>(<span class="fu">as.undirected</span>(g2), <span class="at">root =</span> <span class="dv">5</span>, <span class="at">flip.y =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(oldpar)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">par</span>(oldpar)</span></code></pre></div>
 </div>
 </div>
 <div id="indices-calculation" class="section level1" number="3">
@@ -764,274 +733,186 @@ calculation</h1>
 the nuances of the CCI and RCI</p>
 <p>Before calculation, the information on the barriers passability are
 needed.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check edged and nodes attributes, add pass_u and pass_d fields</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>g_v_df <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;vertices&quot;</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>g_v_df</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    name length HSI Id</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1      1 0.2  1</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2      1 0.1  2</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     5      2 0.3  5</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     3      3 0.4  3</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     4      4 0.5  4</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6      1 0.5  6</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7      5 0.5  7</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 10   10      1 0.6 10</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     8      7 0.7  8</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     9      7 0.8  9</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11      3 0.8 11</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12      2 0.8 12</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13      4 0.8 13</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14      5 0.8 14</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15      6 0.8 15</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 16   16      9 0.8 16</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>g_e_df <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;edges&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pass_u =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(id_dam),<span class="fl">0.1</span>,<span class="cn">NA</span>),</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">pass_d =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(id_dam),<span class="fl">0.7</span>,<span class="cn">NA</span>))</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>g_e_df</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="do">##    from to id_dam  type pass_u pass_d</span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1  2      1   dam    0.1    0.7</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2  5   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     5 11      2   dam    0.1    0.7</span></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     3  4      3   dam    0.1    0.7</span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     4  5   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6  7      4   dam    0.1    0.7</span></span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7 10   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 8    10 13      5   dam    0.1    0.7</span></span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     8  9      6   dam    0.1    0.7</span></span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 10    9 10   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11 12   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12 14   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13 12   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14 15      7   dam    0.1    0.7</span></span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15 16   &lt;NA&gt; joint     NA     NA</span></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Recreate graph</span></span>
-<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> g_e_df, <span class="at">vertices =</span> g_v_df)</span>
-<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>g </span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="do">## IGRAPH 887c0f3 DN-- 16 15 -- </span></span>
-<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="do">## + attr: name (v/c), length (v/n), HSI (v/n), Id (v/c), id_dam (e/c),</span></span>
-<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="do">## | type (e/c), pass_u (e/n), pass_d (e/n)</span></span>
-<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="do">## + edges from 887c0f3 (vertex names):</span></span>
-<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
-<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Check edged and nodes attributes, add pass_u and pass_d fields</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>g_v_df <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;vertices&quot;</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>g_v_df</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="do">##    name length HSI Id</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="do">## 1     1      1 0.2  1</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="do">## 2     2      1 0.1  2</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="do">## 5     5      2 0.3  5</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="do">## 3     3      3 0.4  3</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="do">## 4     4      4 0.5  4</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="do">## 6     6      1 0.5  6</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="do">## 7     7      5 0.5  7</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="do">## 10   10      1 0.6 10</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="do">## 8     8      7 0.7  8</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="do">## 9     9      7 0.8  9</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="do">## 11   11      3 0.8 11</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="do">## 12   12      2 0.8 12</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="do">## 13   13      4 0.8 13</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="do">## 14   14      5 0.8 14</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="do">## 15   15      6 0.8 15</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="do">## 16   16      9 0.8 16</span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>g_e_df <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;edges&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pass_u =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(id_dam),<span class="fl">0.1</span>,<span class="cn">NA</span>),</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>         <span class="at">pass_d =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(id_dam),<span class="fl">0.7</span>,<span class="cn">NA</span>))</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>g_e_df</span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a><span class="do">##    from to id_dam  type pass_u pass_d</span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="do">## 1     1  2      1   dam    0.1    0.7</span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="do">## 2     2  5   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="do">## 3     5 11      2   dam    0.1    0.7</span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="do">## 4     3  4      3   dam    0.1    0.7</span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a><span class="do">## 5     4  5   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a><span class="do">## 6     6  7      4   dam    0.1    0.7</span></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="do">## 7     7 10   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a><span class="do">## 8    10 13      5   dam    0.1    0.7</span></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a><span class="do">## 9     8  9      6   dam    0.1    0.7</span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a><span class="do">## 10    9 10   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a><span class="do">## 11   11 12   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a><span class="do">## 12   12 14   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a><span class="do">## 13   13 12   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a><span class="do">## 14   14 15      7   dam    0.1    0.7</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a><span class="do">## 15   15 16   &lt;NA&gt; joint     NA     NA</span></span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a><span class="co"># Recreate graph</span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>g <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> g_e_df, <span class="at">vertices =</span> g_v_df)</span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a>g </span>
+<span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a><span class="do">## IGRAPH d032580 DN-- 16 15 -- </span></span>
+<span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a><span class="do">## + attr: name (v/c), length (v/n), HSI (v/n), Id (v/c), id_dam (e/c),</span></span>
+<span id="cb9-47"><a href="#cb9-47" tabindex="-1"></a><span class="do">## | type (e/c), pass_u (e/n), pass_d (e/n)</span></span>
+<span id="cb9-48"><a href="#cb9-48" tabindex="-1"></a><span class="do">## + edges from d032580 (vertex names):</span></span>
+<span id="cb9-49"><a href="#cb9-49" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
+<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span></code></pre></div>
 <p>Index with default settings.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">param =</span> <span class="fl">0.9</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="do">##        num  den    index</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 553.8299 3721 0.148839</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">param =</span> <span class="fl">0.9</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="do">##        num  den    index</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="do">## 1 553.8299 3721 0.148839</span></span></code></pre></div>
 <p>Index with default settings, only <span class="math inline">\(c_{ij}\)</span> or <span class="math inline">\(B_{ij}\)</span> contributions</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">B_ij_flag =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="do">##        num  den     index</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 791.8553 3721 0.2128071</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">param =</span> <span class="fl">0.9</span>, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="do">##       num  den     index</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 1200.63 3721 0.3226632</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">B_ij_flag =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="do">##        num  den     index</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="do">## 1 791.8553 3721 0.2128071</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">param =</span> <span class="fl">0.9</span>, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="do">##       num  den     index</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="do">## 1 1200.63 3721 0.3226632</span></span></code></pre></div>
 <p>Index with default settings, only <span class="math inline">\(B_{ij}\)</span> contributions with threshold on
 the distance</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>, </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">0</span>, <span class="at">param_d =</span> <span class="dv">5</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="do">##   num  den     index</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 453 3721 0.1217415</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>, </span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">5</span>, <span class="at">param_d =</span> <span class="dv">10</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">##    num  den     index</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 1028 3721 0.2762698</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;symmetric&quot;</span>, </span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param =</span> <span class="dv">10</span>)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="do">##    num  den    index</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 1239 3721 0.332975</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>, </span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">0</span>, <span class="at">param_d =</span> <span class="dv">5</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="do">##   num  den     index</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="do">## 1 453 3721 0.1217415</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>, </span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">5</span>, <span class="at">param_d =</span> <span class="dv">10</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="do">##    num  den     index</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="do">## 1 1028 3721 0.2762698</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;symmetric&quot;</span>, </span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param =</span> <span class="dv">10</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="do">##    num  den    index</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="do">## 1 1239 3721 0.332975</span></span></code></pre></div>
 <p>Index for reach, inbound connections used, only <span class="math inline">\(B_{ij}\)</span> contributions with threshold on
 the distance</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">index_type =</span> <span class="st">&quot;reach&quot;</span>, <span class="at">index_mode =</span> <span class="st">&quot;to&quot;</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>, </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">0</span>, <span class="at">param_d =</span> <span class="dv">5</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="do">##    name num den      index</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1   7  61 0.11475410</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2   6  61 0.09836066</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     5   7  61 0.11475410</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     3   7  61 0.11475410</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     4   6  61 0.09836066</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6   6  61 0.09836066</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7   6  61 0.09836066</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 10   10   7  61 0.11475410</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     8   7  61 0.11475410</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     9   7  61 0.11475410</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11  10  61 0.16393443</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12   7  61 0.11475410</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13   6  61 0.09836066</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14  11  61 0.18032787</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15   6  61 0.09836066</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 16   16   9  61 0.14754098</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>,</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>                  <span class="at">index_type =</span> <span class="st">&quot;reach&quot;</span>, <span class="at">index_mode =</span> <span class="st">&quot;to&quot;</span>,</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">5</span>, <span class="at">param_d =</span> <span class="dv">10</span>)</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="do">##    name num den     index</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1  23  61 0.3770492</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2  23  61 0.3770492</span></span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     5  23  61 0.3770492</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     3  14  61 0.2295082</span></span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     4  21  61 0.3442623</span></span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6  11  61 0.1803279</span></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7  18  61 0.2950820</span></span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 10   10  22  61 0.3606557</span></span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     8  14  61 0.2295082</span></span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     9  17  61 0.2786885</span></span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11  25  61 0.4098361</span></span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12  23  61 0.3770492</span></span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13  17  61 0.2786885</span></span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14  16  61 0.2622951</span></span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15  20  61 0.3278689</span></span>
-<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="do">## 16   16   9  61 0.1475410</span></span>
-<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>                  <span class="at">index_type =</span> <span class="st">&quot;reach&quot;</span>, <span class="at">index_mode =</span> <span class="st">&quot;to&quot;</span>,</span>
-<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;symmetric&quot;</span>, </span>
-<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param =</span> <span class="dv">10</span>)</span>
-<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a><span class="do">##    name num den     index</span></span>
-<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1  21  61 0.3442623</span></span>
-<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2  25  61 0.4098361</span></span>
-<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     5  26  61 0.4262295</span></span>
-<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     3  14  61 0.2295082</span></span>
-<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     4  16  61 0.2622951</span></span>
-<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6  11  61 0.1803279</span></span>
-<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7  13  61 0.2131148</span></span>
-<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a><span class="do">## 10   10  30  61 0.4918033</span></span>
-<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     8  14  61 0.2295082</span></span>
-<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     9  19  61 0.3114754</span></span>
-<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11  32  61 0.5245902</span></span>
-<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12  34  61 0.5573770</span></span>
-<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13  31  61 0.5081967</span></span>
-<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14  25  61 0.4098361</span></span>
-<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15  25  61 0.4098361</span></span>
-<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a><span class="do">## 16   16  15  61 0.2459016</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>                  <span class="at">index_type =</span> <span class="st">&quot;reach&quot;</span>, <span class="at">index_mode =</span> <span class="st">&quot;to&quot;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">0</span>, <span class="at">param_d =</span> <span class="dv">5</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="do">##    name num den      index</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="do">## 1     1   7  61 0.11475410</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="do">## 2     2   6  61 0.09836066</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="do">## 5     5   7  61 0.11475410</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="do">## 3     3   7  61 0.11475410</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="do">## 4     4   6  61 0.09836066</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="do">## 6     6   6  61 0.09836066</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="do">## 7     7   6  61 0.09836066</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="do">## 10   10   7  61 0.11475410</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="do">## 8     8   7  61 0.11475410</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="do">## 9     9   7  61 0.11475410</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="do">## 11   11  10  61 0.16393443</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="do">## 12   12   7  61 0.11475410</span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="do">## 13   13   6  61 0.09836066</span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="do">## 14   14  11  61 0.18032787</span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="do">## 15   15   6  61 0.09836066</span></span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="do">## 16   16   9  61 0.14754098</span></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>,</span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a>                  <span class="at">index_type =</span> <span class="st">&quot;reach&quot;</span>, <span class="at">index_mode =</span> <span class="st">&quot;to&quot;</span>,</span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param_u =</span> <span class="dv">5</span>, <span class="at">param_d =</span> <span class="dv">10</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a><span class="do">##    name num den     index</span></span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a><span class="do">## 1     1  23  61 0.3770492</span></span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a><span class="do">## 2     2  23  61 0.3770492</span></span>
+<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a><span class="do">## 5     5  23  61 0.3770492</span></span>
+<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="do">## 3     3  14  61 0.2295082</span></span>
+<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a><span class="do">## 4     4  21  61 0.3442623</span></span>
+<span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a><span class="do">## 6     6  11  61 0.1803279</span></span>
+<span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a><span class="do">## 7     7  18  61 0.2950820</span></span>
+<span id="cb13-34"><a href="#cb13-34" tabindex="-1"></a><span class="do">## 10   10  22  61 0.3606557</span></span>
+<span id="cb13-35"><a href="#cb13-35" tabindex="-1"></a><span class="do">## 8     8  14  61 0.2295082</span></span>
+<span id="cb13-36"><a href="#cb13-36" tabindex="-1"></a><span class="do">## 9     9  17  61 0.2786885</span></span>
+<span id="cb13-37"><a href="#cb13-37" tabindex="-1"></a><span class="do">## 11   11  25  61 0.4098361</span></span>
+<span id="cb13-38"><a href="#cb13-38" tabindex="-1"></a><span class="do">## 12   12  23  61 0.3770492</span></span>
+<span id="cb13-39"><a href="#cb13-39" tabindex="-1"></a><span class="do">## 13   13  17  61 0.2786885</span></span>
+<span id="cb13-40"><a href="#cb13-40" tabindex="-1"></a><span class="do">## 14   14  16  61 0.2622951</span></span>
+<span id="cb13-41"><a href="#cb13-41" tabindex="-1"></a><span class="do">## 15   15  20  61 0.3278689</span></span>
+<span id="cb13-42"><a href="#cb13-42" tabindex="-1"></a><span class="do">## 16   16   9  61 0.1475410</span></span>
+<span id="cb13-43"><a href="#cb13-43" tabindex="-1"></a><span class="fu">index_calculation</span>(g, <span class="at">c_ij_flag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb13-44"><a href="#cb13-44" tabindex="-1"></a>                  <span class="at">index_type =</span> <span class="st">&quot;reach&quot;</span>, <span class="at">index_mode =</span> <span class="st">&quot;to&quot;</span>,</span>
+<span id="cb13-45"><a href="#cb13-45" tabindex="-1"></a>                  <span class="at">dir_distance_type =</span> <span class="st">&quot;symmetric&quot;</span>, </span>
+<span id="cb13-46"><a href="#cb13-46" tabindex="-1"></a>                  <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">param =</span> <span class="dv">10</span>)</span>
+<span id="cb13-47"><a href="#cb13-47" tabindex="-1"></a><span class="do">##    name num den     index</span></span>
+<span id="cb13-48"><a href="#cb13-48" tabindex="-1"></a><span class="do">## 1     1  21  61 0.3442623</span></span>
+<span id="cb13-49"><a href="#cb13-49" tabindex="-1"></a><span class="do">## 2     2  25  61 0.4098361</span></span>
+<span id="cb13-50"><a href="#cb13-50" tabindex="-1"></a><span class="do">## 5     5  26  61 0.4262295</span></span>
+<span id="cb13-51"><a href="#cb13-51" tabindex="-1"></a><span class="do">## 3     3  14  61 0.2295082</span></span>
+<span id="cb13-52"><a href="#cb13-52" tabindex="-1"></a><span class="do">## 4     4  16  61 0.2622951</span></span>
+<span id="cb13-53"><a href="#cb13-53" tabindex="-1"></a><span class="do">## 6     6  11  61 0.1803279</span></span>
+<span id="cb13-54"><a href="#cb13-54" tabindex="-1"></a><span class="do">## 7     7  13  61 0.2131148</span></span>
+<span id="cb13-55"><a href="#cb13-55" tabindex="-1"></a><span class="do">## 10   10  30  61 0.4918033</span></span>
+<span id="cb13-56"><a href="#cb13-56" tabindex="-1"></a><span class="do">## 8     8  14  61 0.2295082</span></span>
+<span id="cb13-57"><a href="#cb13-57" tabindex="-1"></a><span class="do">## 9     9  19  61 0.3114754</span></span>
+<span id="cb13-58"><a href="#cb13-58" tabindex="-1"></a><span class="do">## 11   11  32  61 0.5245902</span></span>
+<span id="cb13-59"><a href="#cb13-59" tabindex="-1"></a><span class="do">## 12   12  34  61 0.5573770</span></span>
+<span id="cb13-60"><a href="#cb13-60" tabindex="-1"></a><span class="do">## 13   13  31  61 0.5081967</span></span>
+<span id="cb13-61"><a href="#cb13-61" tabindex="-1"></a><span class="do">## 14   14  25  61 0.4098361</span></span>
+<span id="cb13-62"><a href="#cb13-62" tabindex="-1"></a><span class="do">## 15   15  25  61 0.4098361</span></span>
+<span id="cb13-63"><a href="#cb13-63" tabindex="-1"></a><span class="do">## 16   16  15  61 0.2459016</span></span></code></pre></div>
 </div>
-<div id="barriers-prioritization-calculation-and-visualization" class="section level1" number="4">
+<div id="barriers-prioritization-calculation" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> Barriers prioritization
-calculation and visualization</h1>
+calculation</h1>
 <p>The function <code>index_calcualtion</code> allows to calculate the
 CCI and RCI changes when barriers are removed. Metadata on which dams
 are to be removed and how the passability changes are to be provided in
 the ‘dams_metadata’ object. Parallel calculations can be activated.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dams_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;id_dam&quot;</span> <span class="ot">=</span>  <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>),</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;pass_u_updated&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;pass_d_updated&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>dams_metadata</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   id_dam pass_u_updated pass_d_updated</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      1              1              1</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      2              1              1</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      3              1              1</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      4              1              1</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      5              1              1</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 6      6              1              1</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 7      7              1              1</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">d_index_calculation</span>(g,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">barriers_metadata =</span> dams_metadata,</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">id_barrier =</span> <span class="st">&quot;id_dam&quot;</span>,</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">ncores =</span> <span class="dv">3</span>,</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">param_u =</span> <span class="dv">10</span>,  <span class="at">param_d =</span> <span class="dv">10</span>, <span class="at">param =</span> <span class="fl">0.5</span>,</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">index_type =</span> <span class="st">&quot;full&quot;</span>,</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>,</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>                    <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>)</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="do">##   id_dam      num  den     index  index_bl   d_index</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      1 759.0978 3721 0.2040037 0.1998951  2.055376</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      2 897.4074 3721 0.2411737 0.1998951 20.650131</span></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      3 784.4321 3721 0.2108122 0.1998951  5.461397</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      4 768.5105 3721 0.2065333 0.1998951  3.320849</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      5 911.6736 3721 0.2450077 0.1998951 22.568122</span></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 6      6 834.9497 3721 0.2243885 0.1998951 12.253134</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 7      7 855.4097 3721 0.2298871 0.1998951 15.003837</span></span></code></pre></div>
-<p>Calculated index can be joined with the original graph and plotted to
-check spatial patterns.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>d_index <span class="ot">&lt;-</span> <span class="fu">d_index_calculation</span> (g,</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">barriers_metadata =</span> dams_metadata,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">id_barrier =</span> <span class="st">&quot;id_dam&quot;</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">ncores =</span> <span class="dv">3</span>,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">param_u =</span> <span class="dv">10</span>,  <span class="at">param_d =</span> <span class="dv">10</span>,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                                <span class="at">index_type =</span> <span class="st">&quot;full&quot;</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                                <span class="at">B_ij_flag =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check edged and nodes attributes</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>g_v_df <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;vertices&quot;</span>)</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>g_v_df</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="do">##    name length HSI Id</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1      1 0.2  1</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2      1 0.1  2</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     5      2 0.3  5</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     3      3 0.4  3</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     4      4 0.5  4</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6      1 0.5  6</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7      5 0.5  7</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 10   10      1 0.6 10</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     8      7 0.7  8</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     9      7 0.8  9</span></span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11      3 0.8 11</span></span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12      2 0.8 12</span></span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13      4 0.8 13</span></span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14      5 0.8 14</span></span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15      6 0.8 15</span></span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 16   16      9 0.8 16</span></span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>g_e_df <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">as_data_frame</span>(g, <span class="at">what =</span> <span class="st">&quot;edges&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(d_index, <span class="at">by =</span> <span class="st">&quot;id_dam&quot;</span>)</span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>g_e_df</span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="do">##    from to id_dam  type pass_u pass_d       num  den     index  index_bl</span></span>
-<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1  2      1   dam    0.1    0.7  807.3490 3721 0.2169710 0.2128071</span></span>
-<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     2  5   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     5 11      2   dam    0.1    0.7 1008.4973 3721 0.2710286 0.2128071</span></span>
-<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     3  4      3   dam    0.1    0.7  837.5552 3721 0.2250887 0.2128071</span></span>
-<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     4  5   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     6  7      4   dam    0.1    0.7  818.9726 3721 0.2200947 0.2128071</span></span>
-<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     7 10   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 8    10 13      5   dam    0.1    0.7 1184.2933 3721 0.3182729 0.2128071</span></span>
-<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     8  9      6   dam    0.1    0.7  976.2077 3721 0.2623509 0.2128071</span></span>
-<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a><span class="do">## 10    9 10   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   11 12   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a><span class="do">## 12   12 14   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a><span class="do">## 13   13 12   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a><span class="do">## 14   14 15      7   dam    0.1    0.7 1223.1558 3721 0.3287170 0.2128071</span></span>
-<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   15 16   &lt;NA&gt; joint     NA     NA        NA   NA        NA        NA</span></span>
-<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a><span class="do">##      d_index</span></span>
-<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   1.956632</span></span>
-<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a><span class="do">## 2         NA</span></span>
-<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  27.358782</span></span>
-<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   5.771242</span></span>
-<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a><span class="do">## 5         NA</span></span>
-<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a><span class="do">## 6   3.424522</span></span>
-<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a><span class="do">## 7         NA</span></span>
-<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a><span class="do">## 8  49.559308</span></span>
-<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a><span class="do">## 9  23.281074</span></span>
-<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a><span class="do">## 10        NA</span></span>
-<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a><span class="do">## 11        NA</span></span>
-<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a><span class="do">## 12        NA</span></span>
-<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a><span class="do">## 13        NA</span></span>
-<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a><span class="do">## 14 54.467087</span></span>
-<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a><span class="do">## 15        NA</span></span>
-<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Recreate graph</span></span>
-<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> g_e_df, <span class="at">vertices =</span> g_v_df)</span>
-<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a>g </span>
-<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a><span class="do">## IGRAPH 89f3eb8 DN-- 16 15 -- </span></span>
-<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a><span class="do">## + attr: name (v/c), length (v/n), HSI (v/n), Id (v/c), id_dam (e/c),</span></span>
-<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a><span class="do">## | type (e/c), pass_u (e/n), pass_d (e/n), num (e/n), den (e/n), index</span></span>
-<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a><span class="do">## | (e/n), index_bl (e/n), d_index (e/n)</span></span>
-<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a><span class="do">## + edges from 89f3eb8 (vertex names):</span></span>
-<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 1 -&gt;2  2 -&gt;5  5 -&gt;11 3 -&gt;4  4 -&gt;5  6 -&gt;7  7 -&gt;10 10-&gt;13 8 -&gt;9  9 -&gt;10</span></span>
-<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] 11-&gt;12 12-&gt;14 13-&gt;12 14-&gt;15 15-&gt;16</span></span>
-<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a><span class="co"># Fortify and plot graph</span></span>
-<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a>gg0 <span class="ot">&lt;-</span> <span class="fu">ggnetwork</span>(g, <span class="at">layout =</span>  <span class="fu">layout_as_tree</span>(g <span class="sc">%&gt;%</span> as.undirected, <span class="at">root =</span> <span class="dv">16</span>), <span class="at">scale =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(gg0, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend)) <span class="sc">+</span></span>
-<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edges</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span>,</span>
-<span id="cb17-81"><a href="#cb17-81" aria-hidden="true" tabindex="-1"></a>             <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&quot;pt&quot;</span>), <span class="at">type =</span> <span class="st">&quot;open&quot;</span>), </span>
-<span id="cb17-82"><a href="#cb17-82" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">color =</span> d_index)) <span class="sc">+</span></span>
-<span id="cb17-83"><a href="#cb17-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_nodes</span>() <span class="sc">+</span></span>
-<span id="cb17-84"><a href="#cb17-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis</span>()<span class="sc">+</span></span>
-<span id="cb17-85"><a href="#cb17-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_blank</span>()</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>dams_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;id_dam&quot;</span> <span class="ot">=</span>  <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>),</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                            <span class="st">&quot;pass_u_updated&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                            <span class="st">&quot;pass_d_updated&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>dams_metadata</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="do">##   id_dam pass_u_updated pass_d_updated</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="do">## 1      1              1              1</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="do">## 2      2              1              1</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="do">## 3      3              1              1</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="do">## 4      4              1              1</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="do">## 5      5              1              1</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="do">## 6      6              1              1</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="do">## 7      7              1              1</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="fu">d_index_calculation</span>(g,</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>                    <span class="at">barriers_metadata =</span> dams_metadata,</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>                    <span class="at">id_barrier =</span> <span class="st">&quot;id_dam&quot;</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>                    <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">ncores =</span> <span class="dv">3</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>                    <span class="at">param_u =</span> <span class="dv">10</span>,  <span class="at">param_d =</span> <span class="dv">10</span>, <span class="at">param =</span> <span class="fl">0.5</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>                    <span class="at">index_type =</span> <span class="st">&quot;full&quot;</span>,</span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>                    <span class="at">dir_distance_type =</span> <span class="st">&quot;asymmetric&quot;</span>,</span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>                    <span class="at">disp_type =</span> <span class="st">&quot;threshold&quot;</span>)</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a><span class="do">##   id_dam      num  den     index  index_bl   d_index</span></span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="do">## 1      1 759.0978 3721 0.2040037 0.1998951  2.055376</span></span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="do">## 2      2 897.4074 3721 0.2411737 0.1998951 20.650131</span></span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="do">## 3      3 784.4321 3721 0.2108122 0.1998951  5.461397</span></span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="do">## 4      4 768.5105 3721 0.2065333 0.1998951  3.320849</span></span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a><span class="do">## 5      5 911.6736 3721 0.2450077 0.1998951 22.568122</span></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="do">## 6      6 834.9497 3721 0.2243885 0.1998951 12.253134</span></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="do">## 7      7 855.4097 3721 0.2298871 0.1998951 15.003837</span></span></code></pre></div>
 </div>
 <div id="references-and-key-literature" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> References and key
